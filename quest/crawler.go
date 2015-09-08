@@ -10,6 +10,7 @@ import (
 func crawle(rank, url string, quest chan string, wg *sync.WaitGroup) {
 	// XPATH of quest name
 	// '//table/tr[(position() mod 2) = 1]/td[1]/a[1]/text()'
+	defer wg.Done()
 	path := xmlpath.MustCompile("//table/tr/td[1]/span/../a[1]/text()")
 	resp, err := http.Get(url)
 	if err != nil {
@@ -26,7 +27,6 @@ func crawle(rank, url string, quest chan string, wg *sync.WaitGroup) {
 	for iter.Next() {
 		quest <- fmt.Sprintf("{\"rank\": \"%s\", \"name\": \"%s\"},", rank, iter.Node().String())
 	}
-	wg.Done()
 }
 
 func main() {
