@@ -32,7 +32,7 @@ func readQuests(name string) error {
 
 func root(rw http.ResponseWriter, req *http.Request) {
 	output := randQuest()
-	io.WriteString(rw, output)
+	io.WriteString(rw, output+"\n")
 	fmt.Println(output)
 }
 
@@ -43,6 +43,7 @@ func init() {
 func main() {
 	input := flag.String("file", "quests.json", "Quests json location")
 	httpPtr := flag.Bool("http", false, "Open http server")
+	ip := flag.String("ip", "0.0.0.0", "http server ip")
 	port := flag.Int("port", 8080, "http server port")
 	flag.Parse()
 	err := readQuests(*input)
@@ -55,7 +56,7 @@ func main() {
 		return
 	}
 	http.Handle("/root/", http.HandlerFunc(root))
-	err = http.ListenAndServe(fmt.Sprintf(":%d", *port), nil)
+	err = http.ListenAndServe(fmt.Sprintf("%s:%d", *ip, *port), nil)
 	if err != nil {
 		log.Fatal("ListenAndServe", err)
 	}
