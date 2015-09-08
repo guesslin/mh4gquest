@@ -10,7 +10,7 @@ import (
 func crawle(rank, url string, quest chan string, wg *sync.WaitGroup) {
 	// XPATH of quest name
 	// '//table/tr[(position() mod 2) = 1]/td[1]/a[1]/text()'
-	path := xmlpath.MustCompile("//table/tr/td[1]/a[1]/text()")
+	path := xmlpath.MustCompile("//table/tr/td[1]/span/../a[1]/text()")
 	resp, err := http.Get(url)
 	if err != nil {
 		fmt.Println("Error while fetching", url)
@@ -23,13 +23,8 @@ func crawle(rank, url string, quest chan string, wg *sync.WaitGroup) {
 		return
 	}
 	iter := path.Iter(root)
-	count := 1
 	for iter.Next() {
-		result := fmt.Sprintf("{\"rank\": \"%s\", \"name\": \"%s\"}", rank, iter.Node().String())
-		if (count % 2) == 1 {
-			quest <- result
-		}
-		count++
+		quest <- fmt.Sprintf("{\"rank\": \"%s\", \"name\": \"%s\"},", rank, iter.Node().String())
 	}
 	wg.Done()
 }
@@ -49,6 +44,7 @@ func main() {
 		"集會所下載Ｇ級": "http://wiki.mh4g.org/data/1724.html", // 下載Ｇ級
 		"集會所下載上位": "http://wiki.mh4g.org/data/1567.html", // 下載上位
 		"集會所下載下位": "http://wiki.mh4g.org/data/1490.html", // 下載下位
+		"故事任務":    "http://wiki.mh4g.org/data/1785.html", // 故事任務
 	}
 	quest := make(chan string)
 	go func() {
