@@ -56,7 +56,9 @@ func main() {
 		wg.Wait()
 		close(quest)
 	}()
+	fmt.Println("{\"quests\": [")
 	for c := range quest {
 		fmt.Println(c)
 	}
+	fmt.Println("]}")
 }
