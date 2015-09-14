@@ -55,7 +55,8 @@ func main() {
 		fmt.Println(randQuest())
 		return
 	}
-	http.Handle("/root/", http.HandlerFunc(root))
+	http.Handle("/", http.HandlerFunc(root))
+	fmt.Printf("Serve MH4G Quest Random Generator at %s:%d\n", *ip, *port)
 	err = http.ListenAndServe(fmt.Sprintf("%s:%d", *ip, *port), nil)
 	if err != nil {
 		log.Fatal("ListenAndServe", err)
