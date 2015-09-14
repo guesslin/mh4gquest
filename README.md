@@ -8,6 +8,18 @@ Usage
 
 	mh4gquest -file=quests.json
 
+Docker
+======
+
+Build Image
+-----------
+
+	docker build -t <image_tag> -f ./Dockerfile .
+
+Run Container
+-------------
+
+	docker run -d -p 8080:8080 <image_tag>
 
 TODO
 ====
