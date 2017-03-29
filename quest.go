@@ -4,16 +4,18 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"math/rand"
-	"net/http"
 	"os"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
-var quests List
+var (
+	quests List
+)
 
 func randQuest() string {
 	num := rand.Int31n(int32(len(quests.Quests)))
@@ -30,35 +32,37 @@ func readQuests(name string) error {
 	return nil
 }
 
-func root(rw http.ResponseWriter, req *http.Request) {
+func root(c *gin.Context) {
 	output := randQuest()
-	io.WriteString(rw, output+"\n")
-	fmt.Println(output)
+	c.Writer.WriteString(output)
+	log.Println(output)
 }
 
 func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
+	log.SetOutput(os.Stderr)
 }
 
 func main() {
-	input := flag.String("file", "quests.json", "Quests json location")
-	httpPtr := flag.Bool("http", false, "Open http server")
-	ip := flag.String("ip", "0.0.0.0", "http server ip")
-	port := flag.Int("port", 8080, "http server port")
+	var input string
+	var httpPtr bool
+	var ip string
+	var port int
+	flag.StringVar(&input, "file", "quests.json", "Quests json location")
+	flag.BoolVar(&httpPtr, "http", false, "Open http server")
+	flag.StringVar(&ip, "ip", "0.0.0.0", "http server ip")
+	flag.IntVar(&port, "port", 8080, "http server port")
 	flag.Parse()
-	err := readQuests(*input)
+	err := readQuests(input)
 	if err != nil {
-		fmt.Println("Read Quest Error!!")
+		log.Fatal("Read Quest Error!!")
+	}
+	if httpPtr == false {
+		log.Println(randQuest())
 		return
 	}
-	if *httpPtr == false {
-		fmt.Println(randQuest())
-		return
-	}
-	http.Handle("/", http.HandlerFunc(root))
-	fmt.Printf("Serve MH4G Quest Random Generator at %s:%d\n", *ip, *port)
-	err = http.ListenAndServe(fmt.Sprintf("%s:%d", *ip, *port), nil)
-	if err != nil {
-		log.Fatal("ListenAndServe", err)
-	}
+	server := gin.New()
+	server.Use(gin.LoggerWithWriter(os.Stderr), gin.Recovery())
+	server.GET("/", root)
+	server.Run(fmt.Sprintf("%s:%d", ip, port))
 }
