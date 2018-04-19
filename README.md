@@ -27,3 +27,8 @@ TODO
 * 任務等級挑選
 * 武器限制
 * 處理網頁要求
+
+Status
+======
+
+[![Build Status](https://travis-ci.org/guesslin/mh4gquest.svg)](https://travis-ci.org/guesslin/mh4gquest)
