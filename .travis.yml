@@ -1,0 +1,22 @@
+sudo: required
+
+language: go
+
+services:
+  - docker
+
+os:
+  - linux
+
+go:
+  - 1.9
+
+install:
+  - go get -u github.com/kardianos/govendor
+
+before_script:
+  - govendor sync -v
+
+script:
+  - go test -v ./...
+  - docker build . -t mh4gquest:latest
